@@ -16,8 +16,8 @@ will print with out the space in between the tokens.
 use clay_lib::{Nargs, Token};
 
 use std::collections::HashMap;
-use std::env;
-use std::path::Path;
+// use std::env;
+// use std::path::Path;
 
 // type func = fn(Vec<Token>) -> Option<()>;
 
@@ -99,29 +99,90 @@ pub fn terpri<'a>(_things: &Vec<Token>) -> Result<Option<Token>, &'a str> {
     return Ok(None);
 }
 
+fn add_fn(dict: &mut HashMap<String, (Nargs, String)>, lisp: &str, num_args: Nargs, rust: &str) {
+    dict.insert(lisp.to_string(), (num_args, rust.to_string()));
+}
+
+/*
+#[no_mangle]
+pub fn get_funcs<'a>() -> Vec<(
+    String,
+    Nargs,
+    String,
+    //&'a (dyn Fn(&Vec<Token>) -> Result<Option<Token>, &'a str>),
+)> {
+    let mut std_funcs: Vec<(
+        String,
+        Nargs,
+        // String,
+        &'a (dyn Fn(&Vec<Token>) -> Result<Option<Token>, &'a str>),
+    )> = Vec::new();
+
+    // base lib
+    // std_funcs.push(("write", Nargs::INF, &write));
+    // std_funcs.push(("print", Nargs::INF, &write));
+    // std_funcs.push(("write-line", Nargs::INF, &write_line));
+    // std_funcs.push(("terpri", Nargs::Num(0), &terpri));
+    // std_funcs.push(("not", Nargs::Num(1), &not));
+    // std_funcs.push(("!", Nargs::Num(1), &not));
+    std_funcs.push(("write".to_string(), Nargs::INF, "write".to_string()));
+    std_funcs.push(("print".to_string(), Nargs::INF, "write".to_string()));
+    std_funcs.push((
+        "write-line".to_string(),
+        Nargs::INF,
+        "write_line".to_string(),
+    ));
+    std_funcs.push(("terpri".to_string(), Nargs::Num(0), "terpri".to_string()));
+    std_funcs.push(("not".to_string(), Nargs::Num(1), "not".to_string()));
+    std_funcs.push(("!".to_string(), Nargs::Num(1), "not".to_string()));
+
+    return std_funcs;
+}
+*/
+
 #[no_mangle]
 pub fn get_funcs<'a>() -> HashMap<
-    &'a str,
+    String,
     (
         Nargs,
-        &'a (dyn Fn(&Vec<Token>) -> Result<Option<Token>, &'a str>),
+        String,
+        //&'a (dyn Fn(&Vec<Token>) -> Result<Option<Token>, &'a str>),
     ),
 > {
     let mut std_funcs: HashMap<
-        &'a str,
+        String,
         (
             Nargs,
-            &'a (dyn Fn(&Vec<Token>) -> Result<Option<Token>, &'a str>),
+            String,
+            // &'a (dyn Fn(&Vec<Token>) -> Result<Option<Token>, &'a str>),
         ),
     > = HashMap::new();
 
     // base lib
-    std_funcs.insert("write", (Nargs::INF, &write));
-    std_funcs.insert("print", (Nargs::INF, &write));
-    std_funcs.insert("write-line", (Nargs::INF, &write_line));
-    std_funcs.insert("terpri", (Nargs::Num(0), &terpri));
-    std_funcs.insert("not", (Nargs::Num(1), &not));
-    std_funcs.insert("!", (Nargs::Num(1), &not));
+    // std_funcs.push(("write", Nargs::INF, &write));
+    // std_funcs.push(("print", Nargs::INF, &write));
+    // std_funcs.push(("write-line", Nargs::INF, &write_line));
+    // std_funcs.push(("terpri", Nargs::Num(0), &terpri));
+    // std_funcs.push(("not", Nargs::Num(1), &not));
+    // std_funcs.push(("!", Nargs::Num(1), &not));
+
+    // std_funcs.insert("write".to_string(), (Nargs::INF, "write".to_string()));
+    // std_funcs.insert("print".to_string(), (Nargs::INF, "write".to_string()));
+    // std_funcs.insert(
+    //     "write-line".to_string(),
+    //     (Nargs::INF, "write_line".to_string()),
+    // );
+    // std_funcs.insert("terpri".to_string(), (Nargs::Num(0), "terpri".to_string()));
+    // std_funcs.insert("not".to_string(), (Nargs::Num(1), "not".to_string()));
+    // std_funcs.insert("!".to_string(), (Nargs::Num(1), "not".to_string()));
+
+    add_fn(&mut std_funcs, "write", Nargs::INF, "write");
+    add_fn(&mut std_funcs, "print", Nargs::INF, "write");
+    add_fn(&mut std_funcs, "write-line", Nargs::INF, "write_line");
+    add_fn(&mut std_funcs, "writeln", Nargs::INF, "write_line");
+    add_fn(&mut std_funcs, "terpri", Nargs::INF, "terpri");
+    add_fn(&mut std_funcs, "not", Nargs::INF, "not");
+    add_fn(&mut std_funcs, "!", Nargs::INF, "not");
 
     return std_funcs;
 }
