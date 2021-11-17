@@ -1,12 +1,3 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}
-
 /*
 TODO's:
 * add a raw_write and a raw_write_line functions. will be the same as write and write_lines, but
@@ -16,6 +7,8 @@ will print with out the space in between the tokens.
 use clay_lib::{Nargs, Token};
 
 use std::collections::HashMap;
+use std::io::{self, Write};
+
 // use std::env;
 // use std::path::Path;
 
@@ -45,12 +38,14 @@ pub fn write_line<'a>(lines: &Vec<Token>) -> Result<Option<Token>, &'a str> {
 
 #[no_mangle]
 pub fn write<'a>(lines: &Vec<Token>) -> Result<Option<Token>, &'a str> {
-    println!("in the write function");
-    printf(lines);
+    // print!("in the write function ");
+    let _ = printf(lines);
     return Ok(None);
 }
 
 fn printf(tokens: &Vec<Token>) {
+    let stdout = io::stdout();
+    let mut handle = io::BufWriter::new(stdout);
     // println!("write args: {:?}", tokens);
     let mut loc_lines = tokens.clone();
     // println!("loc_lines: {:?} ", loc_lines);
@@ -59,27 +54,28 @@ fn printf(tokens: &Vec<Token>) {
 
     for i in 0..last_i {
         let line = loc_lines.pop().unwrap();
-        print_line(line);
+        let _ = write!(handle, "{}", print_tok(line));
         if i != last_i - 1 {
-            print!(" ");
+            let _ = write!(handle, " ");
         }
     }
+    handle.flush();
 }
 
-fn print_line(line: Token) {
+fn print_tok(line: Token) -> String {
     match line {
-        Token::Symbol(output) => print!("{}", output),
-        Token::Number(output) => print!("{}", output),
-        Token::Str(output) => print!("{}", output),
+        Token::Symbol(output) => output,
+        Token::Number(output) => output,
+        Token::Str(output) => output,
         // Token::Form(form) => print_form(*form),
-        Token::Bool(truth) => print!(
-            "{}",
-            match truth {
-                true => "t",
-                false => "nil",
+        Token::Bool(truth) => {
+            if truth {
+                "t".to_string()
+            } else {
+                "nil".to_string()
             }
-        ),
-        _ => {} //return Err("ERROR: on write_line. you can't print that."),
+        }
+        _ => panic!("ERROR: in print_tok. you can't print parens and EOFs"), // {} //return Err("ERROR: on write_line. you can't print that."),
     }
 }
 
