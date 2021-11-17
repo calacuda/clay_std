@@ -45,6 +45,7 @@ pub fn write_line<'a>(lines: &Vec<Token>) -> Result<Option<Token>, &'a str> {
 
 #[no_mangle]
 pub fn write<'a>(lines: &Vec<Token>) -> Result<Option<Token>, &'a str> {
+    println!("in the write function");
     printf(lines);
     return Ok(None);
 }
