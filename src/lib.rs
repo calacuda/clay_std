@@ -94,46 +94,126 @@ pub fn terpri<'a>(_things: &Vec<Token>) -> Result<Option<Token>, &'a str> {
     return Ok(None);
 }
 
-fn add_fn(dict: &mut HashMap<String, (Nargs, String)>, lisp: &str, num_args: Nargs, rust: &str) {
-    dict.insert(lisp.to_string(), (num_args, rust.to_string()));
+/*
+fn make_int(num: Token) -> i64 {}
+
+fn make_float(num: Token) -> f64 {}
+*/
+
+#[no_mangle]
+pub fn plus<'a>(nums: &Vec<Token>) -> Result<Option<Token>, &'a str> {
+    /* default addition function */
+    let mut res = match &nums[0] {
+        Token::Number(n) => n.parse::<f64>().unwrap(),
+        _ => panic!("Can't do math on none numeric values."),
+    };
+
+    for num in nums[1..].to_vec() {
+        res += match num {
+            Token::Number(n) => n.parse::<f64>().unwrap(),
+            _ => panic!("Can't do math on none numeric values."),
+        }
+    }
+
+    return Ok(Some(Token::Number(res.to_string())));
+}
+
+#[no_mangle]
+pub fn minus<'a>(nums: &Vec<Token>) -> Result<Option<Token>, &'a str> {
+    /* default minus function */
+    let mut res = match &nums[0] {
+        Token::Number(n) => n.parse::<f64>().unwrap(),
+        _ => panic!("Can't do math on none numeric values."),
+    };
+
+    for num in nums[1..].to_vec() {
+        res -= match num {
+            Token::Number(n) => n.parse::<f64>().unwrap(),
+            _ => panic!("Can't do math on none numeric values."),
+        }
+    }
+
+    return Ok(Some(Token::Number(res.to_string())));
+}
+
+#[no_mangle]
+pub fn multiply<'a>(nums: &Vec<Token>) -> Result<Option<Token>, &'a str> {
+    /* default multiplication function */
+    let mut res = match &nums[0] {
+        Token::Number(n) => n.parse::<f64>().unwrap(),
+        _ => panic!("Can't do math on none numeric values."),
+    };
+
+    for num in nums[1..].to_vec() {
+        res *= match num {
+            Token::Number(n) => n.parse::<f64>().unwrap(),
+            _ => panic!("Can't do math on none numeric values."),
+        }
+    }
+
+    return Ok(Some(Token::Number(res.to_string())));
+}
+
+#[no_mangle]
+pub fn divide<'a>(nums: &Vec<Token>) -> Result<Option<Token>, &'a str> {
+    /* default division function */
+    let mut res = match &nums[0] {
+        Token::Number(n) => n.parse::<f64>().unwrap(),
+        _ => panic!("Can't do math on none numeric values."),
+    };
+
+    for num in nums[1..].to_vec() {
+        res /= match num {
+            Token::Number(n) => n.parse::<f64>().unwrap(),
+            _ => panic!("Can't do math on none numeric values."),
+        }
+    }
+
+    return Ok(Some(Token::Number(res.to_string())));
+}
+
+#[no_mangle]
+pub fn greater_then<'a>(nums: &Vec<Token>) -> Result<Option<Token>, &'a str> {
+    assert!(nums.len() == 2);
+
+    let n1 = match nums[0] {
+        Token::Number(n) => n.parse::<f64>().unwrap(),
+        _ => panic!("Can't do math on none numeric values."),
+    };
+
+    let n2 = match nums[1] {
+        Token::Number(n) => n.parse::<f64>().unwrap(),
+        _ => panic!("Can't do math on none numeric values."),
+    };
+
+    return Ok(Some(Token::Bool(n1 > n2)));
+}
+
+#[no_mangle]
+pub fn less_then<'a>(nums: &Vec<Token>) -> Result<Option<Token>, &'a str> {
+    assert!(nums.len() == 2);
+
+    let n1 = match nums[0] {
+        Token::Number(n) => n.parse::<f64>().unwrap(),
+        _ => panic!("Can't do math on none numeric values."),
+    };
+
+    let n2 = match nums[1] {
+        Token::Number(n) => n.parse::<f64>().unwrap(),
+        _ => panic!("Can't do math on none numeric values."),
+    };
+
+    return Ok(Some(Token::Bool(n1 < n2)));
 }
 
 /*
 #[no_mangle]
-pub fn get_funcs<'a>() -> Vec<(
-    String,
-    Nargs,
-    String,
-    //&'a (dyn Fn(&Vec<Token>) -> Result<Option<Token>, &'a str>),
-)> {
-    let mut std_funcs: Vec<(
-        String,
-        Nargs,
-        // String,
-        &'a (dyn Fn(&Vec<Token>) -> Result<Option<Token>, &'a str>),
-    )> = Vec::new();
-
-    // base lib
-    // std_funcs.push(("write", Nargs::INF, &write));
-    // std_funcs.push(("print", Nargs::INF, &write));
-    // std_funcs.push(("write-line", Nargs::INF, &write_line));
-    // std_funcs.push(("terpri", Nargs::Num(0), &terpri));
-    // std_funcs.push(("not", Nargs::Num(1), &not));
-    // std_funcs.push(("!", Nargs::Num(1), &not));
-    std_funcs.push(("write".to_string(), Nargs::INF, "write".to_string()));
-    std_funcs.push(("print".to_string(), Nargs::INF, "write".to_string()));
-    std_funcs.push((
-        "write-line".to_string(),
-        Nargs::INF,
-        "write_line".to_string(),
-    ));
-    std_funcs.push(("terpri".to_string(), Nargs::Num(0), "terpri".to_string()));
-    std_funcs.push(("not".to_string(), Nargs::Num(1), "not".to_string()));
-    std_funcs.push(("!".to_string(), Nargs::Num(1), "not".to_string()));
-
-    return std_funcs;
-}
+pub fn if_cond<'a>(nums: &Vec<Token>) -> Result<Option<Token>, &'a str> {}
 */
+
+fn add_fn(dict: &mut HashMap<String, (Nargs, String)>, lisp: &str, num_args: Nargs, rust: &str) {
+    dict.insert(lisp.to_string(), (num_args, rust.to_string()));
+}
 
 #[no_mangle]
 pub fn get_funcs<'a>() -> HashMap<
@@ -176,6 +256,13 @@ pub fn get_funcs<'a>() -> HashMap<
     add_fn(&mut std_funcs, "terpri", Nargs::INF, "terpri");
     add_fn(&mut std_funcs, "not", Nargs::INF, "not");
     add_fn(&mut std_funcs, "!", Nargs::INF, "not");
+    add_fn(&mut std_funcs, "+", Nargs::INF, "plus");
+    add_fn(&mut std_funcs, "-", Nargs::INF, "minus");
+    add_fn(&mut std_funcs, "*", Nargs::INF, "multiply");
+    add_fn(&mut std_funcs, "/", Nargs::INF, "divide");
+    add_fn(&mut std_funcs, ">", Nargs::Num(2), "greater_then");
+    add_fn(&mut std_funcs, "<", Nargs::Num(2), "less_then");
+    // add_fn(&mut std_funcs, "if", Nargs::INF, "if_cond");
 
     return std_funcs;
 }
